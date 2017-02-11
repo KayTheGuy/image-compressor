@@ -1,11 +1,10 @@
 package Decompressor;
 
 /**
- * @author Kayhan Dehghani Mohammadi
- * Spring 2017
- * CMPT 365 Assignment 2
- * Image Compressor
-**/
+ * @author Kayhan Dehghani Mohammadi 
+ * CMPT 365 Spring 2017
+ * Assignment 2 Image Compressor
+ **/
 
 public class MRGDecompressor {
 
