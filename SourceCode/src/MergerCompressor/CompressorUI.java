@@ -1,4 +1,4 @@
-package Decompressor;
+package MergerCompressor;
 import java.awt.BorderLayout;
 import java.awt.Dialog.ModalityType;
 import java.awt.GridLayout;
@@ -30,29 +30,29 @@ import javax.swing.JPanel;
  * Image Compressor
 **/
 
-public class UI extends JFrame implements ActionListener{
+public class CompressorUI extends JFrame implements ActionListener{
 	private static final long serialVersionUID = 1L;
 	//UI Variables
 	private JFrame mainFrame;
 	private JPanel editButtonsPanel, txtPanel;
 	private JFileChooser fc;
 	private static String imageOneFilePath, imageTwoFilePath;
-	private JButton _showImg1, _showImg2, _showMergedImages, _compress;
+	private JButton _showImg1, _showImg2, _showMergedImages;
 	JMenuBar menuBar;
 	JMenu menu, fileMenu;
-	JMenuItem selectItem, exitItem;
+	JMenuItem selectItem, exitItem, saveItem;
 	JLabel label;
 	
 	//Image Variables
 	private BufferedImage originalImgOne, originalImgTwo;
 	
 	public static void main(String[] args) {
-		new UI();
+		new CompressorUI();
 	}
 	
-	public UI() {
+	public CompressorUI() {
 		//Frame
-		mainFrame = new JFrame("CMPT365 Image Decompressor");
+		mainFrame = new JFrame("CMPT365 Image Compressor/Merger");
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setResizable(false);
 		mainFrame.setSize(600, 400);
@@ -70,11 +70,14 @@ public class UI extends JFrame implements ActionListener{
 		fileMenu = new JMenu("File");
 		menuBar.add(fileMenu);
 		menuBar.add(menu);
-		selectItem = new JMenuItem("Open File...");
+		selectItem = new JMenuItem("Open Files...");
 		selectItem.addActionListener(this);
+		saveItem = new JMenuItem("Save As *.mrg");
+		saveItem.addActionListener(this);
 		exitItem = new JMenuItem("Exit");
 		exitItem.addActionListener(this);
 		fileMenu.add(selectItem);
+		fileMenu.add(saveItem);
 		menu.add(exitItem);
 		mainFrame.setJMenuBar(menuBar);
 		
@@ -85,14 +88,11 @@ public class UI extends JFrame implements ActionListener{
 		_showImg2.addActionListener(this);
 		_showMergedImages = new JButton("Merged Images");
 		_showMergedImages.addActionListener(this);
-		_compress = new JButton("Compress Files");
-		_compress.addActionListener(this);
 		
 		editButtonsPanel.add(_showImg1);
 		editButtonsPanel.add(_showImg2);
 		editButtonsPanel.add(_showMergedImages);
-		editButtonsPanel.add(_compress);
-		
+
 		//TextArea
 		label = new JLabel("<html><br>Welcome!</html>");
 		txtPanel.add(label);
