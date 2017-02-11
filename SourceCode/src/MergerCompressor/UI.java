@@ -1,3 +1,4 @@
+package MergerCompressor;
 import java.awt.BorderLayout;
 import java.awt.Dialog.ModalityType;
 import java.awt.GridLayout;
@@ -36,10 +37,10 @@ public class UI extends JFrame implements ActionListener{
 	private JPanel editButtonsPanel, txtPanel;
 	private JFileChooser fc;
 	private static String imageOneFilePath, imageTwoFilePath;
-	private JButton _showImg1, _showImg2, _showMergedImages, _compress;
+	private JButton _showImg1, _showImg2, _showMergedImages;
 	JMenuBar menuBar;
-    JMenu menu, fileMenu;
-	JMenuItem selectItem, exitItem;
+	JMenu menu, fileMenu;
+	JMenuItem selectItem, exitItem, saveItem;
 	JLabel label;
 	
 	//Image Variables
@@ -69,11 +70,14 @@ public class UI extends JFrame implements ActionListener{
 		fileMenu = new JMenu("File");
 		menuBar.add(fileMenu);
 		menuBar.add(menu);
-		selectItem = new JMenuItem("Open File...");
+		selectItem = new JMenuItem("Open Files...");
 		selectItem.addActionListener(this);
+		saveItem = new JMenuItem("Save As *.mrg");
+		saveItem.addActionListener(this);
 		exitItem = new JMenuItem("Exit");
 		exitItem.addActionListener(this);
 		fileMenu.add(selectItem);
+		fileMenu.add(saveItem);
 		menu.add(exitItem);
 		mainFrame.setJMenuBar(menuBar);
 		
@@ -84,14 +88,11 @@ public class UI extends JFrame implements ActionListener{
 		_showImg2.addActionListener(this);
 		_showMergedImages = new JButton("Merged Images");
 		_showMergedImages.addActionListener(this);
-		_compress = new JButton("Compress Files");
-		_compress.addActionListener(this);
 		
 		editButtonsPanel.add(_showImg1);
 		editButtonsPanel.add(_showImg2);
 		editButtonsPanel.add(_showMergedImages);
-		editButtonsPanel.add(_compress);
-		
+
 		//TextArea
 		label = new JLabel("<html><br>Welcome!</html>");
 		txtPanel.add(label);

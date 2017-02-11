@@ -1,3 +1,4 @@
+package Decompressor;
 
 /**
  * @author Kayhan Dehghani Mohammadi
@@ -6,6 +7,6 @@
  * Image Compressor
 **/
 
-public class ImageUtility {
+public class MRGDecompressor {
 
 }
