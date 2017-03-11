@@ -2,6 +2,8 @@ package MergerCompressor;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Kayhan Dehghani Mohammadi 
@@ -42,5 +44,45 @@ public class MRGCompressor {
 		}
 
 		return resultImage;
+	}
+	
+	//get YUV color space from image
+	public static List<int[][]> getYuvFromImage(BufferedImage image){
+		List<int[][]> yuv = new ArrayList<int[][]>();
+        int[][] y = null;
+        int[][] u = null;
+        int[][] v = null; 
+        int r = 0;
+        int g = 0;
+        int b = 0;
+        int width = 0;
+        int height = 0;
+
+        width = image.getWidth();
+        height = image.getHeight();
+
+        y = new int[height][width];
+        u = new int[height][width];
+        v = new int[height][width];
+
+        for(int i = 0; i < height; i++)
+        {
+	        for(int j = 0; j < width; j++)
+	        {
+		        r = (image.getRGB(j, i) >> 16) & 0xFF;
+		        g = (image.getRGB(j, i) >> 8) & 0xFF;
+		        b = (image.getRGB(j, i) >> 0) & 0xFF;
+		
+		        y[i][j] = (int) ((0.299 * r) + (0.587 * g) + (0.114 * b));
+		        u[i][j] = (int) ((-0.147 * r) - (0.289 * g) + (0.436 * b));
+		        v[i][j] = (int) ((0.615 * r) - (0.515 * g) - (0.100 * b));
+	        }
+        }
+
+        yuv.add(y);
+        yuv.add(u);
+        yuv.add(v);
+
+        return yuv;
 	}
 }
