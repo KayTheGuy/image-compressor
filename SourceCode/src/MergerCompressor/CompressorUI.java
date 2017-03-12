@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -73,6 +74,7 @@ public class CompressorUI extends JFrame implements ActionListener {
 		selectItem.addActionListener(this);
 		saveItem = new JMenuItem("Save As *.mrg");
 		saveItem.addActionListener(this);
+		saveItem.setVisible(false);
 		exitItem = new JMenuItem("Exit");
 		exitItem.addActionListener(this);
 		fileMenu.add(selectItem);
@@ -83,10 +85,13 @@ public class CompressorUI extends JFrame implements ActionListener {
 		// Buttons
 		_showImg1 = new JButton("First Image");
 		_showImg1.addActionListener(this);
+		_showImg1.setVisible(false);
 		_showImg2 = new JButton("Second Image");
 		_showImg2.addActionListener(this);
+		_showImg2.setVisible(false);
 		_showMergedImages = new JButton("Merged Images");
 		_showMergedImages.addActionListener(this);
+		_showMergedImages.setVisible(false);
 
 		editButtonsPanel.add(_showImg1);
 		editButtonsPanel.add(_showImg2);
@@ -113,8 +118,13 @@ public class CompressorUI extends JFrame implements ActionListener {
 
 		if (result == JFileChooser.APPROVE_OPTION) {
 			File[] files = fc.getSelectedFiles();
+			if(files.length !=2) {
+				label.setText("<html>Please select TWO files at once!<br>");
+				return;
+			}
 			imageOneFilePath = files[0].getAbsolutePath();
 			imageTwoFilePath = files[1].getAbsolutePath();
+			
 
 			// Load images
 			try {
@@ -131,6 +141,13 @@ public class CompressorUI extends JFrame implements ActionListener {
 				label.setText("<html><br>First Image : " + fileOneName + "<br>" + "Dimensions (Width x Height): "
 						+ fileOnedimensions + "<br><br>Second Image : " + fileTwoName + "<br>"
 						+ "Dimensions (Width x Height): " + fileTwodimensions + "</html>");
+				
+				_showImg1.setVisible(true);
+				_showImg2.setVisible(true);
+				_showMergedImages.setVisible(true);
+				saveItem.setVisible(true);
+				selectItem.setVisible(false);
+			
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -158,6 +175,8 @@ public class CompressorUI extends JFrame implements ActionListener {
 		} else if (e.getSource() == _showMergedImages) {
 			BufferedImage resutl = MRGCompressor.merge(originalImgOne, originalImgTwo);
 			viewImage(resutl, "Merged Images");
+		}else if (e.getSource() == saveItem) {
+			MRGCompressor.makeMRGformat(MRGCompressor.merge(originalImgOne, originalImgTwo));
 		}
 	}
 }

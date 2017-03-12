@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -23,6 +24,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import MergerCompressor.MRGCompressor;
+
 /**
  * @author Kayhan Dehghani Mohammadi 
  * CMPT 365 Spring 2017
@@ -36,7 +39,6 @@ public class DecompressorUI extends JFrame implements ActionListener {
 	private JPanel editButtonsPanel, txtPanel;
 	private JFileChooser fc;
 	private static String imageOneFilePath, imageTwoFilePath;
-	private JButton _showImg1, _showImg2, _showMergedImages, _compress;
 	JMenuBar menuBar;
 	JMenu menu, fileMenu;
 	JMenuItem selectItem, exitItem;
@@ -77,21 +79,6 @@ public class DecompressorUI extends JFrame implements ActionListener {
 		menu.add(exitItem);
 		mainFrame.setJMenuBar(menuBar);
 
-		// Buttons
-		_showImg1 = new JButton("First Image");
-		_showImg1.addActionListener(this);
-		_showImg2 = new JButton("Second Image");
-		_showImg2.addActionListener(this);
-		_showMergedImages = new JButton("Merged Images");
-		_showMergedImages.addActionListener(this);
-		_compress = new JButton("Compress Files");
-		_compress.addActionListener(this);
-
-		editButtonsPanel.add(_showImg1);
-		editButtonsPanel.add(_showImg2);
-		editButtonsPanel.add(_showMergedImages);
-		editButtonsPanel.add(_compress);
-
 		// TextArea
 		label = new JLabel("<html><br>Welcome!</html>");
 		txtPanel.add(label);
@@ -114,26 +101,19 @@ public class DecompressorUI extends JFrame implements ActionListener {
 		if (result == JFileChooser.APPROVE_OPTION) {
 			File[] files = fc.getSelectedFiles();
 			imageOneFilePath = files[0].getAbsolutePath();
-			imageTwoFilePath = files[1].getAbsolutePath();
+			// show image attributes
+			String fileOneName = Paths.get(imageOneFilePath).getFileName().toString();
+			if(!fileOneName.equals("compressed.mrg")){
 
-			// Load images
-			try {
-				originalImgOne = ImageIO.read(new File(imageOneFilePath));
-				originalImgTwo = ImageIO.read(new File(imageTwoFilePath));
-
-				// show image attributes
-				String fileOneName = Paths.get(imageOneFilePath).getFileName().toString();
-				String fileTwoName = Paths.get(imageTwoFilePath).getFileName().toString();
-				String fileOnedimensions = String.valueOf(originalImgOne.getWidth()) + " x "
-						+ String.valueOf(originalImgOne.getHeight());
-				String fileTwodimensions = String.valueOf(originalImgTwo.getWidth()) + " x "
-						+ String.valueOf(originalImgTwo.getHeight());
-				label.setText("<html><br>First Image : " + fileOneName + "<br>" + "Dimensions (Width x Height): "
-						+ fileOnedimensions + "<br><br>Second Image : " + fileTwoName + "<br>"
-						+ "Dimensions (Width x Height): " + fileTwodimensions + "</html>");
-
-			} catch (IOException e) {
-				e.printStackTrace();
+				label.setText("<html>Please select the correct file. This program can only open compressed.mrg file! <br>");
+			}
+			else {
+				label.setText("Loading...");
+				List<double[][]> pixels = MRGDecompressor.decompressFile();
+				label.setText("<html><br>First Image : compressed.mrg<br>" + "Dimensions (Width x Height): "
+						+ pixels.get(0).length + " x " + pixels.get(0)[0].length + "<br>");
+				BufferedImage mrgImage = MRGDecompressor.getImageFromYuv(pixels, 0);
+				viewImage(mrgImage, "Decompressed Images");
 			}
 		}
 	}
@@ -151,10 +131,6 @@ public class DecompressorUI extends JFrame implements ActionListener {
 			System.exit(0);
 		} else if (e.getSource() == selectItem) {
 			selectFile();
-		} else if (e.getSource() == _showImg1) {
-			viewImage(originalImgOne, "Original Image 1");
-		} else if (e.getSource() == _showImg2) {
-			viewImage(originalImgTwo, "Original Image 2");
 		}
 	}
 }

@@ -2,6 +2,12 @@ package MergerCompressor;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,28 +48,70 @@ public class MRGCompressor {
 				}
 			}
 		}
-
 		return resultImage;
 	}
 	
+	/*
+	 * 1. RGB -> YUV 4:2:0
+	 * 2. 2D DCT
+	 * 3. Quantization
+	 * 4. 1D array of quantized output concatenated with quantization matrix combined
+	 */
+	public static void makeMRGformat(BufferedImage image) {
+		// 1.RGB -> YUV 4:2:0
+		List<double[][]> yuvImage = getYuvFromImage(image);
+		
+		//2. 2D DCT
+		DCT dctUtil = new DCT(yuvImage.get(0)[0].length, yuvImage.get(0).length);
+		
+		List<double[][]> transformedImg = new ArrayList<>();
+		
+		for(double[][] component : yuvImage) {		
+			transformedImg.add(dctUtil.forwardDCT(component));
+		}
+		
+		List<double[][]> buffer = getYuvFromImage(image);
+		
+		double[] tot = new double[3*image.getHeight()*image.getWidth() + 2];
+		int idx = 0;
+		
+		//ADD HEADER
+		tot[idx++] = image.getWidth();
+		tot[idx++] = image.getHeight();
+		
+		for(double[][] component : buffer ){
+			for(int i=0;i<component.length;i++){
+				for(int j=0;j<component[0].length;j++){
+					tot[idx++] = component[i][j];
+				}
+			}
+		}
+		try {
+			write("compressed.mrg",tot);
+		} catch (IOException e) {
+			System.out.println("There was a problem saving the MRG format file!");
+		}				
+	}
+	
 	//get YUV color space from image
-	public static List<int[][]> getYuvFromImage(BufferedImage image){
-		List<int[][]> yuv = new ArrayList<int[][]>();
-        int[][] y = null;
-        int[][] u = null;
-        int[][] v = null; 
-        int r = 0;
-        int g = 0;
-        int b = 0;
+	//with 4:2:0 down sampling
+	private static List<double[][]> getYuvFromImage(BufferedImage image){
+		List<double[][]> yuv = new ArrayList<double[][]>();
+		double[][] y = null;
+		double[][] u = null;
+		double[][] v = null; 
+		double r = 0;
+		double g = 0;
+		double b = 0;
         int width = 0;
         int height = 0;
 
         width = image.getWidth();
         height = image.getHeight();
 
-        y = new int[height][width];
-        u = new int[height][width];
-        v = new int[height][width];
+        y = new double[height][width];
+        u = new double[height][width];
+        v = new double[height][width];
 
         for(int i = 0; i < height; i++)
         {
@@ -73,10 +121,10 @@ public class MRGCompressor {
 		        g = (image.getRGB(j, i) >> 8) & 0xFF;
 		        b = (image.getRGB(j, i) >> 0) & 0xFF;
 		
-		        y[i][j] = (int) ((0.299 * r) + (0.587 * g) + (0.114 * b));
-		        u[i][j] = (int) ((-0.147 * r) - (0.289 * g) + (0.436 * b));
-		        v[i][j] = (int) ((0.615 * r) - (0.515 * g) - (0.100 * b));
-	        }
+		        y[i][j] = (double) ((0.299 * r) + (0.587 * g) + (0.114 * b));
+			    u[i][j] = (double) ((-0.147 * r) - (0.289 * g) + (0.436 * b));
+			    v[i][j] = (double) ((0.615 * r) - (0.515 * g) - (0.100 * b));
+		     }
         }
 
         yuv.add(y);
@@ -85,4 +133,15 @@ public class MRGCompressor {
 
         return yuv;
 	}
+    
+    private static void write (String filename, double[] stream) throws IOException{
+    	  BufferedWriter outputWriter = null;
+    	  outputWriter = new BufferedWriter(new FileWriter(filename));
+    	  for (int i = 0; i < stream.length; i++) {
+    	    outputWriter.write(stream[i]+" ");
+    	    outputWriter.newLine();
+    	  }
+    	  outputWriter.flush();  
+    	  outputWriter.close();  
+    }
 }
